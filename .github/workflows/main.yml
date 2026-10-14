@@ -1,0 +1,39 @@
+
+name: Claude Code Action
+
+on:
+  workflow_dispatch:
+  issue_comment:
+    types: [created]
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  claude:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issue_comment' &&
+       contains(github.event.comment.body, '@claude')) ||
+      github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Claude Code
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Review the Tehzeeb Kangan website in index.html.
+            Improve its professional design, animations,
+            mobile responsiveness, navigation, and accessibility.
+            Preserve existing website content and functionality.
+            Make changes only when appropriate.
+            
